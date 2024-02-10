@@ -5,12 +5,16 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import dotenv from "dotenv";
 import pg from "pg";
+import cors from "cors";
 
 // Cargar las variables de entorno desde el archivo .env
 dotenv.config();
 
 // Configura Express
 const app = express();
+
+// Habilita CORS
+app.use(cors());
 
 app.use(
   session({
@@ -99,6 +103,15 @@ passport.deserializeUser(function(id, done) {
 });
 
 // Define las rutas y demás configuraciones de tu aplicación
+
+// Endpoint para proporcionar la configuración
+app.get('/api/config', (req, res) => {
+  // Obtener el client_id de tus variables de entorno
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+
+  // Devolver la configuración como JSON
+  res.json({ client_id: clientId });
+});
 
 // Define la nueva ruta de redirección después de la autenticación exitosa con Google
 app.get('/auth/google/home', (req, res) => {
