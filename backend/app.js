@@ -6,6 +6,13 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import dotenv from "dotenv";
 import pg from "pg";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const frontendPort = process.env.REACT_APP_FRONTEND_PORT || 3001;
 
 // Cargar las variables de entorno desde el archivo .env
 dotenv.config();
@@ -14,7 +21,14 @@ dotenv.config();
 const app = express();
 
 // Habilita CORS
-app.use(cors());
+app.use(cors({ origin: "http://localhost:3001" }));
+
+app.use(
+  express.static(
+    path.join(__dirname, "..", "frontend", "cornellnotes", "build")
+  )
+);
+
 
 app.use(
   session({
@@ -114,12 +128,13 @@ app.get('/api/config', (req, res) => {
 });
 
 // Define la nueva ruta de redirección después de la autenticación exitosa con Google
-app.get('/auth/google/home', (req, res) => {
+app.get("/auth/google/home", (req, res) => {
   // Aquí puedes realizar cualquier acción que desees después de la autenticación exitosa
   // Por ejemplo, puedes mostrar una página de inicio o redirigir a una página específica
-  
-  res.send('¡Bienvenido! Has iniciado sesión correctamente con Google.');
+
+res.redirect(`http://localhost:${frontendPort}/auth/google/home`);
 });
+
 
 // Actualiza la ruta de inicio de sesión con Google para usar la nueva URL de redirección
 app.get(

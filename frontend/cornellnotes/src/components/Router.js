@@ -9,7 +9,7 @@ const AppRouter = () => {
     <Router>
       <Routes>
         <Route exact path="/" element={<SignInSide />} />
-        <Route path="/home" element={<HomeComponent />} />
+        <Route path="/auth/google/home" element={<HomeComponent />} />
       </Routes>
     </Router>
   );
