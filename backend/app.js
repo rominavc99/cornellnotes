@@ -1,73 +1,39 @@
-// Importa los módulos necesarios
 import express from "express";
 import session from "express-session";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import dotenv from "dotenv";
-import pg from "pg";
 import cors from "cors";
 import path from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
+import notesRoutes from "./routes/notes.routes.js";
+import db from "./db.js";
+import bodyParser from "body-parser";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const frontendPort = process.env.REACT_APP_FRONTEND_PORT || 3001;
 
 // Cargar las variables de entorno desde el archivo .env
 dotenv.config();
 
 // Configura Express
 const app = express();
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
+app.use(bodyParser.json());
 
 // Habilita CORS
-app.use(cors({ origin: "http://localhost:3001" }));
+app.use(cors()); 
 
-app.use(
-  express.static(
-    path.join(__dirname, "..", "frontend", "cornellnotes", "build")
-  )
-);
-
-
+// Configura la sesión de Express
 app.use(
   session({
-    secret: process.env.SECRET_SESSION, 
+    secret: process.env.SECRET_SESSION,
     resave: false,
     saveUninitialized: true,
   })
 );
 
-
-// Obtener la URL de conexión a la base de datos desde las variables de entorno
-const connectionString = process.env.DATABASE_URL;
-
-// Crear un cliente PostgreSQL
-const client = new pg.Client({
-  connectionString: connectionString,
-});
-
-// Conectar al servidor de base de datos PostgreSQL
-client
-  .connect()
-  .then(() => {
-    console.log("Conexión exitosa a la base de datos PostgreSQL");
-  })
-  .catch((error) => {
-    console.error("Error al conectar a la base de datos PostgreSQL", error);
-  });
-
-// Realizar consultas a la base de datos usando el cliente
-// Ejemplo de consulta:
-client
-  .query('SELECT NOW() AS "theTime"')
-  .then((result) => {
-    console.log("Resultado de la consulta:", result.rows[0].theTime);
-  })
-  .catch((error) => {
-    console.error("Error al ejecutar la consulta", error);
-  });
-
+// Inicializa Passport.js middleware
+app.use(passport.initialize());
+app.use(passport.session()); // Usa express-session para la persistencia de sesión
 
 // Configura Passport.js con la estrategia de Google OAuth 2.0
 passport.use(
@@ -75,7 +41,8 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:3000/auth/google/callback",
+      callbackURL: "/auth/google/callback",
+      scope: ["profile", "email"],
     },
     function (accessToken, refreshToken, profile, done) {
       // Aquí puedes acceder a los datos del perfil del usuario, como su nombre y correo electrónico
@@ -83,7 +50,7 @@ passport.use(
       const correoUsuario = profile.emails[0].value;
 
       // Guarda la información del usuario en la base de datos
-      client.query(
+      db.query(
         "INSERT INTO usuarios (user_id, nombre, correo_electronico) VALUES ($1, $2, $3) ON CONFLICT (user_id) DO NOTHING RETURNING *",
         [profile.id, nombreUsuario, correoUsuario],
         (err, result) => {
@@ -102,60 +69,30 @@ passport.use(
   )
 );
 
-// Inicializar Passport.js middleware
-app.use(passport.initialize());
-app.use(passport.session()); // Usa express-session para la persistencia de sesión
-
 // Configura Passport.js para serializar y deserializar usuarios
-passport.serializeUser(function(id, done) {
-  done(null, id);
+passport.serializeUser(function (user, done) {
+  done(null, user);
 });
 
-passport.deserializeUser(function(id, done) {
-  // Aquí puedes buscar el usuario en la base de datos usando el ID
-  done(null, id);
+passport.deserializeUser(function (user, done) {
+  // Aquí no necesitas buscar el usuario en la base de datos si ya lo tienes en el objeto `user`
+  done(null, user);
 });
 
-// Define las rutas y demás configuraciones de tu aplicación
-
-// Endpoint para proporcionar la configuración
-app.get('/api/config', (req, res) => {
-  // Obtener el client_id de tus variables de entorno
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-
-  // Devolver la configuración como JSON
-  res.json({ client_id: clientId });
-});
-
-// Define la nueva ruta de redirección después de la autenticación exitosa con Google
-app.get("/auth/google/home", (req, res) => {
-  // Aquí puedes realizar cualquier acción que desees después de la autenticación exitosa
-  // Por ejemplo, puedes mostrar una página de inicio o redirigir a una página específica
-
-res.redirect(`http://localhost:${frontendPort}/auth/google/home`);
-});
-
-
-// Actualiza la ruta de inicio de sesión con Google para usar la nueva URL de redirección
-app.get(
-  '/auth/google',
-  passport.authenticate('google', { scope: ['profile', 'email'], callbackURL: 'http://localhost:3000/auth/google/callback' })
+// Sirve los archivos estáticos
+app.use(
+  express.static(
+    path.join(__dirname, "..", "frontend", "cornellnotes", "build")
+  )
 );
 
-// Actualiza la ruta de callback de Google para usar la nueva URL de redirección
-app.get(
-  '/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login' }),
-  function (req, res) {
-    // Si la autenticación con Google es exitosa, redirige al usuario a la nueva ruta de redirección
-    res.redirect('/auth/google/home');
-  }
-);
+// Monta las rutas definidas en notesRoutes
 
 
-// ...
+app.use(notesRoutes);
 
 // Inicia el servidor
-app.listen(3000, () => {
-  console.log("Servidor en funcionamiento en el puerto 3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor en funcionamiento en el puerto ${PORT}`);
 });

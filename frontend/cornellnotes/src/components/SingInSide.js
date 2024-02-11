@@ -8,76 +8,61 @@ import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { GoogleLogin } from "@react-oauth/google";
+import { useNavigate } from "react-router-dom";
+import decodeJwt from "../utils/decodeJwt.ts";
 
 const defaultTheme = createTheme();
 
-  function handleCredentialResponse(response) {
-    console.log("Encoded JWT ID token: " + response.credential);
-    // Aquí deberías enviar el token al backend para que pueda validar y procesar la sesión del usuario
-    // Por ahora, simplemente redireccionaremos al usuario a una URL en tu backend
-    const jwtToken = response.credential;
-    const backendRedirectUrl = "http://localhost:3000/auth/google/home"; // Reemplaza esto con la URL de tu backend
-
-    // Redireccionar al usuario a la ruta deseada en tu backend
-    window.location.href = backendRedirectUrl;
-  }
-
-function SignInSide() {
+const SignInSide = () => {
   const [clientId, setClientId] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(
-      "Ejecutando useEffect para obtener la configuración del cliente..."
-    );
-    // Hacer la solicitud para obtener la configuración del backend al cargar el componente
     axios
       .get("http://localhost:3000/api/config")
       .then((response) => {
-        // Actualizar el estado con el client_id recibido del backend
-        console.log("Respuesta del servidor:", response.data);
         setClientId(response.data.client_id);
       })
-      .catch((error) =>
-        console.error("Error al obtener la configuración:", error)
+      .catch((error) => {
+        console.error("Error al obtener la configuración:", error);
+      });
+  }, []);
+
+const handleLoginSuccess = async (response) => {
+  // Manejar la respuesta de inicio de sesión exitosa
+  console.log("Inicio de sesión exitoso:", response);
+  if (response.credential) {
+    const { payload } = decodeJwt(response.credential);
+    console.log("payload credential", payload);
+
+    // Crear un objeto con los datos que deseas enviar al servidor
+    const userData = {
+      user_id: payload.sub, // Aquí debes cambiar payload.sub por el campo adecuado que contiene el ID de usuario en tu token decodificado
+      nombre: payload.name, // Cambiar payload.name si el campo es diferente en tu token
+      correo_electronico: payload.email, // Cambiar payload.email si el campo es diferente en tu token
+    };
+
+    try {
+      // Enviar la solicitud POST al servidor para guardar los datos en la base de datos
+      const response = await axios.post(
+        "http://localhost:3000/api/users",
+        userData
       );
-  }, []);
-
-  useEffect(() => {
-    const initializeGoogleSignIn = () => {
-      if (
-        window.google &&
-        window.google.accounts &&
-        window.google.accounts.id
-      ) {
-        window.google.accounts.id.initialize({
-          client_id: clientId,
-          callback: handleCredentialResponse,
-        });
-        window.google.accounts.id.renderButton(
-          document.getElementById("buttonDiv"),
-          { theme: "outline", size: "large" }
-        );
-        window.google.accounts.id.prompt();
-      } else {
-        console.error("Google Sign-In initialization failed.");
-      }
-    };
-
-    if (clientId) {
-      initializeGoogleSignIn();
+      console.log("Respuesta del servidor:", response.data);
+    } catch (error) {
+      console.error("Error al enviar datos de usuario al backend:", error);
+      // Manejar el error si es necesario
     }
-  }, [clientId]);
+  }
+  navigate("/home");
+};
 
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    document.body.appendChild(script);
 
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+  const handleLoginFailure = (error) => {
+    // Manejar el error de inicio de sesión
+    console.error("Error de inicio de sesión:", error);
+  };
 
 
 
@@ -118,13 +103,20 @@ function SignInSide() {
             <Typography component="h1" variant="h5">
               Sign in
             </Typography>
-            {/* Contenedor para el botón de inicio de sesión con Google */}
-            <div id="buttonDiv" />
+            {clientId && (
+              <GoogleLogin
+                clientId={clientId}
+                onSuccess={handleLoginSuccess}
+                onFailure={handleLoginFailure}
+                buttonText="Sign in with Google"
+                cookiePolicy="single_host_origin"
+              />
+            )}
           </Box>
         </Grid>
       </Grid>
     </ThemeProvider>
   );
-}
+};
 
 export default SignInSide;
