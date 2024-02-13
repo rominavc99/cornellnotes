@@ -6,6 +6,7 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import DescriptionTwoToneIcon from "@mui/icons-material/DescriptionTwoTone";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { GoogleLogin } from "@react-oauth/google";
@@ -34,6 +35,7 @@ const handleLoginSuccess = async (response) => {
   console.log("Inicio de sesión exitoso:", response);
   if (response.credential) {
     const { payload } = decodeJwt(response.credential);
+    localStorage.setItem("userId", payload.sub);
     console.log("payload credential", payload);
 
     // Crear un objeto con los datos que deseas enviar al servidor
@@ -90,28 +92,48 @@ const handleLoginSuccess = async (response) => {
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
           <Box
             sx={{
-              my: 8,
               mx: 4,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              justifyContent: "space-evenly",
+              height: "100vh",
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-              <LockOutlinedIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
-              Sign in
-            </Typography>
-            {clientId && (
-              <GoogleLogin
-                clientId={clientId}
-                onSuccess={handleLoginSuccess}
-                onFailure={handleLoginFailure}
-                buttonText="Sign in with Google"
-                cookiePolicy="single_host_origin"
-              />
-            )}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Avatar sx={{ m: 1 }}>
+                <DescriptionTwoToneIcon />
+              </Avatar>
+              <Typography component="h1" variant="h2">
+                Cornell Notes
+              </Typography>
+              <Typography component="h2" variant="h5">
+                own your knowledge
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              {clientId && (
+                <GoogleLogin
+                  clientId={clientId}
+                  onSuccess={handleLoginSuccess}
+                  onFailure={handleLoginFailure}
+                  buttonText="Sign in with Google"
+                  cookiePolicy="single_host_origin"
+                />
+              )}
+            </Box>
           </Box>
         </Grid>
       </Grid>

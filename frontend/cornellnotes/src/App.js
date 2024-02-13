@@ -3,12 +3,40 @@ import React from "react";
 import AppRouter from "./components/Router";
 
 const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#ff5722",
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          // Estilos para el TextField
+        },
+      },
     },
-    secondary: {
-      main: "#03a9f4",
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          "& fieldset": {
+            borderColor: "darkgray", // Cambia el color del borde
+          },
+          "&:hover fieldset": {
+            borderColor: "darkgray", // Cambia el color del borde al pasar el mouse
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: "darkgray", // Cambia el color del borde al enfocar
+          },
+        },
+        notchedOutline: {
+          borderColor: "darkgray", // Asegura que el borde tenga el color deseado
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          "&.Mui-focused": {
+            color: "darkgray", // Cambia el color del texto al enfocar
+          },
+        },
+      },
     },
   },
 });

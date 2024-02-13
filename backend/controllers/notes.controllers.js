@@ -1,8 +1,7 @@
 import db from "../db.js";
-import dotenv from "dotenv";
-import passport from "passport";
 import bodyParser from "body-parser";
 import express from "express";
+import dayjs from "dayjs";
 
 const app = express();
 const frontendPort = process.env.REACT_APP_FRONTEND_PORT || 3001;
@@ -15,16 +14,81 @@ const getUsername = async (req, res) => {
 
 }
 
-const getNote = (req, res) => {
-  res.send("notas");
+const getNote = async (req, res) => {
+  // Extrae el user_id de la cabecera Authorization
+  // Asume que el token está en el formato "Bearer <user_id>"
+  const authHeader = req.headers.authorization;
+  let userId = null;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    userId = authHeader.substring(7, authHeader.length); // Extrae el user_id del token
+  }
+
+  if (!userId) {
+    return res.status(401).json({ message: "No se proporcionó el user_id" });
+  }
+
+  try {
+    // Consulta a la base de datos para obtener las notas del usuario
+    const result = await db.query(
+      "SELECT * FROM notas WHERE user_id = $1 ORDER BY fecha DESC", // Ordena las notas por fecha
+      [userId]
+    );
+
+    // Formatea las fechas de las notas antes de enviarlas al cliente
+    const formattedNotes = result.rows.map((note) => ({
+      ...note,
+      fecha: dayjs(note.fecha).format("YYYY-MM-DD"), // Formatea la fecha a 'YYYY-MM-DD'
+    }));
+
+    res.json(formattedNotes); // Envía las notas formateadas
+  } catch (error) {
+    console.error("Error al obtener las notas:", error);
+    res.status(500).json({ message: "Error al obtener las notas" });
+  }
 };
 
-const addNote = (req, res) => {
-  res.send("agregar nota");
+
+
+const addNote = async (req, res) => {
+  // Extrae todos los campos necesarios del cuerpo de la solicitud
+  const {
+    user_id,
+    titulo,
+    subtitulo,
+    fecha,
+    ideas_clave,
+    notas_clave,
+    resumen,
+  } = req.body;
+
+  try {
+    // Inserta la nueva nota en la base de datos
+    const result = await db.query(
+      `INSERT INTO notas (user_id, titulo, subtitulo, fecha, ideas_clave, notas_clave, resumen) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;`,
+      [user_id, titulo, subtitulo, fecha, ideas_clave, notas_clave, resumen] // Asegura que los valores correspondan en orden
+    );
+
+    // Si todo sale bien, devuelve la nota insertada al cliente
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error al guardar la nota en la base de datos:", error);
+    res.status(500).json({ message: "Error al guardar la nota" });
+  }
 };
 
-const deleteNote = (req, res) => {
-  res.send("eliminar nota");
+
+const deleteNote = async (req, res) => {
+  const { nota_id } = req.params; // Asume que pasas el ID de la nota como parámetro en la URL
+
+  try {
+    await db.query("DELETE FROM notas WHERE nota_id = $1", [nota_id]);
+    res.json({ message: "Nota eliminada correctamente." });
+  } catch (error) {
+    console.error("Error al eliminar la nota:", error);
+    res.status(500).json({ message: "Error al eliminar la nota" });
+  }
 };
 
 const updateNote = (req, res) => {
@@ -40,34 +104,6 @@ const getConfig = (req, res) => {
   // Devolver la configuración como JSON
   res.json({ client_id: clientId });
 };
-
-const googleAuthHome = (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*");
-  // Verifica si el usuario está autenticado
-  if (req.isAuthenticated()) {
-    // Aquí puedes realizar cualquier acción que desees después de la autenticación exitosa
-    // Por ejemplo, puedes mostrar una página de inicio o redirigir a una página específica
-   res.redirect(`http://localhost:${frontendPort}/home`);
-  } else {
-    // Si el usuario no está autenticado, redirige a la página de inicio de sesión de Google
-    res.redirect("/auth/google");
-  }
-};
-
-const googleAuth = (req, res, next) => {
-  
-    res.header("Access-Control-Allow-Origin", "*");
-  // Si el usuario ya está autenticado, redirígelo a la página de inicio
-  if (req.isAuthenticated()) {
-    return res.redirect("/auth/google/home");
-  }
-  // Si el usuario no está autenticado, procede con la autenticación con Google
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-    callbackURL: "http://localhost:3000/auth/google/callback",
-  })(req, res, next);
-};
-
 
 export const saveUserData = async (req, res) => {
   try {
@@ -93,4 +129,4 @@ export const saveUserData = async (req, res) => {
  
     
 
-export { getUsername, getNote, addNote, deleteNote, updateNote, getConfig, googleAuth, googleAuthHome};
+export { getUsername, getNote, addNote, deleteNote, updateNote, getConfig};
