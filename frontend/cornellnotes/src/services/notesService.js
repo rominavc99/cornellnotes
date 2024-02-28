@@ -1,7 +1,7 @@
 // src/services/notesService.js
 import axios from "axios";
 
-const BASE_URL = "http://localhost:3000"; // Asegúrate de usar la URL correcta de tu backend
+const BASE_URL = "https://cornellnotes-2sn1.onrender.com"; // Asegúrate de usar la URL correcta de tu backend
 
 const createNote = async (noteData) => {
   const userId = localStorage.getItem("userId"); // Recupera el user_id de localStorage
