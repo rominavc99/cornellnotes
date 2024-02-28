@@ -51,7 +51,7 @@ const Footer = () => {
           <Grid item xs={12} sm={3}>
             <Box>
               <Typography variant="h6" color="textPrimary" gutterBottom>
-                Cornell Notes
+                IdeaCatcher
               </Typography>
               {/* Coloca aquí tu imagen de logo */}
             </Box>
@@ -71,31 +71,60 @@ const Footer = () => {
               Follow Us
             </Typography>
             <IconButton aria-label="LinkedIn" color="inherit">
-              <LinkedInIcon />
+              <Link
+                href="https://www.linkedin.com/in/romina-verdugo-b71208198"
+                target="_blank"
+                color="inherit"
+              >
+                <LinkedInIcon />
+              </Link>
             </IconButton>
             <IconButton aria-label="Instagram" color="inherit">
-              <InstagramIcon />
+              <Link
+                href="https://www.instagram.com/romina.v.c?igsh=dWg0bHl5MGN1dWtt"
+                target="_blank"
+                color="inherit"
+              >
+                <InstagramIcon />
+              </Link>
             </IconButton>
             <IconButton aria-label="GitHub" color="inherit">
-              <GitHubIcon />
+              <Link
+                href="https://github.com/rominavc99"
+                target="_blank"
+                color="inherit"
+              >
+                <GitHubIcon />
+              </Link>
             </IconButton>
             <IconButton aria-label="Behance" color="inherit">
-              <BehanceIcon />
+              <Link
+                href="https://www.behance.net/rominaverdugo"
+                target="_blank"
+                color="inherit"
+              >
+                <BehanceIcon />
+              </Link>
             </IconButton>
             <IconButton aria-label="Personal Portfolio" color="inherit">
-              <WebAssetIcon />
+              <Link
+                href="https://yourportfolio.com"
+                target="_blank"
+                color="inherit"
+              >
+                <WebAssetIcon />
+              </Link>
             </IconButton>
           </Grid>
           <Grid item xs={12} sm={3}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               How do we take care of your data?
             </Typography>
-            <Link href="#" color="inherit">
-              Privacy Policy
-            </Link>
-            <Link href="#" color="inherit">
-              Terms and Conditions
-            </Link>
+            <Box>
+              <Link component={RouterLink} to="/privacy" color="inherit">
+                Privacy Terms and Conditions
+              </Link>
+            </Box>
           </Grid>
         </Grid>
         <Typography

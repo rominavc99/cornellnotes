@@ -93,7 +93,7 @@ const handleChange = (field, value) => {
             <Grid item container spacing={2} xs={12}>
               <Grid item xs={12} sm={10}>
                 <TextField
-                  label="Título"
+                  label="Title"
                   fullWidth
                   value={note.titulo}
                   onChange={(e) => handleChange("titulo", e.target.value)}
@@ -101,7 +101,7 @@ const handleChange = (field, value) => {
               </Grid>
               <Grid item xs={12} sm={2}>
                 <DatePicker
-                  label="Fecha"
+                  label="Date"
                   value={note.fecha ? dayjs(note.fecha) : null} // Convierte la cadena a un objeto Day.js
                   onChange={(newValue) => {
                     handleChange(
@@ -116,7 +116,7 @@ const handleChange = (field, value) => {
 
             <Grid item xs={12}>
               <TextField
-                label="Subtítulo"
+                label="Subtitle"
                 fullWidth
                 value={note.subtitulo}
                 onChange={(e) => handleChange("subtitulo", e.target.value)}
@@ -127,7 +127,7 @@ const handleChange = (field, value) => {
             <Grid item container spacing={2} xs={12}>
               <Grid item xs={12} sm={4}>
                 <TextField
-                  label="Ideas Clave"
+                  label="Cues"
                   multiline
                   minRows={12}
                   variant="outlined"
@@ -138,7 +138,7 @@ const handleChange = (field, value) => {
               </Grid>
               <Grid item xs={12} sm={8}>
                 <TextField
-                  label="Notas Clave"
+                  label="Notes"
                   multiline
                   minRows={12}
                   variant="outlined"
@@ -151,7 +151,7 @@ const handleChange = (field, value) => {
 
             <Grid item xs={12}>
               <TextField
-                label="Resumen"
+                label="Summary"
                 multiline
                 minRows={6}
                 variant="outlined"

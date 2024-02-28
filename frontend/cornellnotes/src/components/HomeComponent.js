@@ -274,7 +274,7 @@ export default function PersistentDrawerLeft() {
               component="div"
               sx={{ flexGrow: 1 }}
             >
-              Cornell Notes by dinostudio
+              IdeaCatcher by dinostudio
             </Typography>
             {/* Botón de cerrar sesión */}
             <IconButton
@@ -315,7 +315,7 @@ export default function PersistentDrawerLeft() {
                 <ListItemIcon>
                   <AddIcon /> {/* Asegúrate de importar AddIcon */}
                 </ListItemIcon>
-                <ListItemText primary="Agregar Nueva Nota" />
+                <ListItemText primary="Create note" />
               </ListItem>
 
               {notas.map((nota) => (

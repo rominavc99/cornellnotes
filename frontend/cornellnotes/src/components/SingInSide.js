@@ -107,11 +107,12 @@ const handleLoginSuccess = async (response) => {
                 alignItems: "center",
               }}
             >
-              <Avatar sx={{ m: 1 }}>
-                <DescriptionTwoToneIcon />
-              </Avatar>
+              <Avatar
+                sx={{ width: 250, height: 250 }}
+                src={`${process.env.PUBLIC_URL}/ideacatcherlogo.png`}
+              />
               <Typography component="h1" variant="h2">
-                Cornell Notes
+                IdeaCatcher
               </Typography>
               <Typography component="h2" variant="h5">
                 own your knowledge
