@@ -69,4 +69,30 @@ const fetchNotes = async () => {
   }
 };
 
-export { createNote, updateNote, deleteNote, fetchNotes };
+// src/services/notesService.js
+
+// ... tus funciones existentes ...
+
+const fetchNoteDetails = async (noteId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/home/${noteId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener los detalles de la nota:", error);
+    throw error; // Re-throw the error to be handled by the calling function
+  }
+};
+
+const saveNoteEdits = async (noteId, noteData) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/home/${noteId}`, noteData);
+    return response.data;
+  } catch (error) {
+    console.error("Error al guardar las ediciones de la nota:", error);
+    throw error; // Re-throw the error to be handled by the calling function
+  }
+};
+
+export { createNote, updateNote, deleteNote, fetchNotes, fetchNoteDetails, saveNoteEdits };
+
+

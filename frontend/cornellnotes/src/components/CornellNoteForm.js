@@ -4,6 +4,7 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import dayjs from "dayjs";
+import { saveNoteEdits } from "../services/notesService";
 
 import axios from "axios";
 
@@ -101,9 +102,12 @@ const handleChange = (field, value) => {
               <Grid item xs={12} sm={2}>
                 <DatePicker
                   label="Fecha"
-                  value={note.fecha} // Asegúrate de que note.fecha sea manejado correctamente como un objeto Date o similar
+                  value={note.fecha ? dayjs(note.fecha) : null} // Convierte la cadena a un objeto Day.js
                   onChange={(newValue) => {
-                    handleChange("fecha", newValue);
+                    handleChange(
+                      "fecha",
+                      newValue ? newValue.toISOString() : null
+                    ); // Almacena la fecha como una cadena ISO
                   }}
                   renderInput={(params) => <TextField {...params} />}
                 />
@@ -125,7 +129,7 @@ const handleChange = (field, value) => {
                 <TextField
                   label="Ideas Clave"
                   multiline
-                  minRows={4}
+                  minRows={12}
                   variant="outlined"
                   fullWidth
                   value={note.ideas_clave}
@@ -136,7 +140,7 @@ const handleChange = (field, value) => {
                 <TextField
                   label="Notas Clave"
                   multiline
-                  minRows={4}
+                  minRows={12}
                   variant="outlined"
                   fullWidth
                   value={note.notas_clave}
@@ -149,7 +153,7 @@ const handleChange = (field, value) => {
               <TextField
                 label="Resumen"
                 multiline
-                minRows={4}
+                minRows={6}
                 variant="outlined"
                 fullWidth
                 value={note.resumen}

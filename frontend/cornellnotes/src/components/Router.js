@@ -4,22 +4,24 @@ import LoginComponent from "./LoginComponent";
 import HomeComponent from "./HomeComponent";
 import SignInSide from "./SingInSide";
 import ProtectedRoute from "./ProtectedRoute"; 
+import AboutUs from "./AboutUs";
+import Documentation from "./Documentation";
+import Footer from "./Footer";
+import { Box } from "@mui/material";
 
 const AppRouter = () => {
   
   return (
     <Router>
-      <Routes>
-        <Route exact path="/" element={<SignInSide />} />
-        <Route
-          path="/home"
-          element={
-            
-              <HomeComponent />
-            
-          }
-        />
-      </Routes>
+      <Box sx={{ pb: 10 }}>
+        <Routes>
+          <Route exact path="/" element={<SignInSide />} />
+          <Route path="/home" element={<HomeComponent />} />
+          <Route exact path="/aboutus" element={<AboutUs />} />
+          <Route exact path="/documentation" element={<Documentation />} />
+        </Routes>
+      </Box>
+      <Footer />
     </Router>
   );
 };

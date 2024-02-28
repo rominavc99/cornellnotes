@@ -48,6 +48,26 @@ const getNote = async (req, res) => {
   }
 };
 
+const getNoteDetails = async (req, res) => {
+  const { nota_id } = req.params; // Obtén el ID de la nota de los parámetros de la solicitud
+
+  try {
+    const result = await db.query("SELECT * FROM notas WHERE nota_id = $1", [
+      nota_id,
+    ]);
+
+    if (result.rows.length) {
+      res.json(result.rows[0]);
+    } else {
+      res.status(404).json({ message: "Nota no encontrada" });
+    }
+  } catch (error) {
+    console.error("Error al obtener detalles de la nota:", error);
+    res.status(500).json({ message: "Error al obtener detalles de la nota" });
+  }
+};
+
+
 
 
 const addNote = async (req, res) => {
@@ -91,9 +111,39 @@ const deleteNote = async (req, res) => {
   }
 };
 
-const updateNote = (req, res) => {
-  res.send("actualizar nota");
+const updateNote = async (req, res) => {
+  const { nota_id } = req.params; // El ID de la nota a actualizar
+  const { titulo, subtitulo, fecha, ideas_clave, notas_clave, resumen } =
+    req.body;
+
+  try {
+    const result = await db.query(
+      `UPDATE notas 
+       SET titulo = $2, subtitulo = $3, fecha = $4, ideas_clave = $5, notas_clave = $6, resumen = $7
+       WHERE nota_id = $1 
+       RETURNING *;`,
+      [
+        parseInt(nota_id, 10),
+        titulo,
+        subtitulo,
+        fecha,
+        ideas_clave,
+        notas_clave,
+        resumen,
+      ] // Asegúrate de que nota_id es un entero
+    );
+
+    if (result.rows.length) {
+      res.json(result.rows[0]);
+    } else {
+      res.status(404).json({ message: "Nota no encontrada para actualizar" });
+    }
+  } catch (error) {
+    console.error("Error al actualizar la nota:", error);
+    res.status(500).json({ message: "Error al actualizar la nota" });
+  }
 };
+
 
 
 const getConfig = (req, res) => {
@@ -129,4 +179,4 @@ export const saveUserData = async (req, res) => {
  
     
 
-export { getUsername, getNote, addNote, deleteNote, updateNote, getConfig};
+export { getUsername, getNote, addNote, deleteNote, updateNote, getConfig, getNoteDetails};

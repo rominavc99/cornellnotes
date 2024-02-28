@@ -11,6 +11,7 @@ import {
   addNote,
   deleteNote,
   updateNote,
+  getNoteDetails,
 } from "../controllers/notes.controllers.js";
 import { getConfig,saveUserData } from "../controllers/notes.controllers.js";
 
@@ -54,12 +55,15 @@ router.get("/home", getNote);
 router.post("/home", addNote);
 router.delete("/home/:nota_id", deleteNote);
 router.put("/home/:nota_id", updateNote);
+router.get("/home/:nota_id", getNoteDetails);
 
 
 // Endpoint para proporcionar la configuración
 router.get('/api/config', getConfig);
 
 router.post("/api/users", saveUserData);
+
+
 
 
 

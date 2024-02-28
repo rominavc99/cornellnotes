@@ -6,17 +6,22 @@ import CssBaseline from "@mui/material/CssBaseline";
 import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
+import { Button } from "@mui/material";
 import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import { createNote, updateNote, deleteNote,fetchNotes } from "../services/notesService";
+import {
+  createNote,
+  updateNote,
+  deleteNote,
+  fetchNotes,
+  fetchNoteDetails,
+  saveNoteEdits,
+} from "../services/notesService";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Link from "@mui/material/Link";
 import CardNote from "./CardNote";
@@ -27,7 +32,14 @@ import { Fab, Tooltip } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import SearchIcon from "@mui/icons-material/Search";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import AddIcon from "@mui/icons-material/Add";
 
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 
 function Copyright() {
@@ -115,6 +127,22 @@ export default function PersistentDrawerLeft() {
     resumen: "",
   });
 
+  const isNoteSelected = note && note.nota_id;
+
+  // Determina si se está mostrando una nota existente
+  const isEditing = note && note.nota_id;
+
+  const handleNoteClick = async (nota_id) => {
+    try {
+      const noteDetails = await fetchNoteDetails(nota_id);
+      setNote(noteDetails); // Actualiza el estado con los detalles de la nota
+      console.log(noteDetails);
+    } catch (error) {
+      console.error("Error al obtener los detalles de la nota:", error);
+      // Agrega aquí la lógica de manejo de errores si es necesario
+    }
+  };
+
   // Cargar las notas cuando el componente se monte
   useEffect(() => {
     const cargarNotas = async () => {
@@ -155,13 +183,17 @@ export default function PersistentDrawerLeft() {
   };
 
   const handleEditClick = async (noteId) => {
+    console.log(typeof noteId, noteId);
     try {
       const updatedNote = await updateNote(noteId, note);
       console.log("Nota actualizada:", updatedNote);
-      // Procesar la respuesta
+      setNotas((prevNotas) =>
+        prevNotas.map((n) => (n.nota_id === noteId ? updatedNote : n))
+      );
+      // Opcional: Mostrar mensaje de éxito al usuario
     } catch (error) {
       console.error("Error al actualizar la nota:", error);
-      // Manejar el error
+      // Opcional: Mostrar mensaje de error al usuario
     }
   };
 
@@ -169,32 +201,92 @@ export default function PersistentDrawerLeft() {
     try {
       await deleteNote(noteId);
       console.log("Nota eliminada");
-      // Procesar la acción, por ejemplo, actualizar la lista de notas
+      setNotas((prevNotas) => prevNotas.filter((n) => n.nota_id !== noteId));
+      // Opcional: Mostrar mensaje de éxito al usuario
     } catch (error) {
       console.error("Error al eliminar la nota:", error);
-      // Manejar el error
+      // Opcional: Mostrar mensaje de error al usuario
     }
   };
+  const handleNewNoteClick = () => {
+    setNote({
+      titulo: "",
+      subtitulo: "",
+      fecha: null, // Ajusta según cómo manejes las fechas
+      ideas_clave: "",
+      notas_clave: "",
+      resumen: "",
+    });
+  };
+
+  const DrawerHeaderStyled = styled(DrawerHeader)({
+    display: "flex",
+    alignItems: "center",
+    padding: theme.spacing(0, 1),
+    justifyContent: "flex-end",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    color: "white",
+    backgroundImage: "url(https://source.unsplash.com/random?wallpapers)", // Asegúrate de que esta es la URL de tu imagen
+  });
+
+  const DrawerContent = styled("div")({
+    overflowY: "auto", // Habilita el desplazamiento vertical solo si es necesario
+    maxHeight: "calc(100vh - tamaño de tu header)", // Ajusta el tamaño de tu header
+    // Resto de tus estilos...
+  });
+
+  const AccordionStyled = styled(Accordion)({
+    boxShadow: "none",
+    backgroundColor: "#E5E4E2",
+    "&:before": {
+      display: "none",
+    },
+    // Resto de tus estilos...
+  });
   return (
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
-        <AppBar position="fixed" open={open}>
+        <AppBar
+          position="fixed"
+          open={open}
+          sx={{
+            backgroundColor: "#424242", // Un color primario más vibrante
+            color: "#FFFFFF",
+            boxShadow: "none", // Opcional: elimina la sombra para un diseño más plano
+            borderBottom: "1px solid #FFFFFF1A", // Agrega un borde sutil en la parte inferior
+          }}
+        >
           <Toolbar>
             <IconButton
+              edge="start"
               color="inherit"
               aria-label="open drawer"
               onClick={handleDrawerOpen}
-              edge="start"
               sx={{ mr: 2, ...(open && { display: "none" }) }}
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap component="div">
+            <Typography
+              variant="h6"
+              noWrap
+              component="div"
+              sx={{ flexGrow: 1 }}
+            >
               Cornell Notes by dinostudio
             </Typography>
+            {/* Botón de cerrar sesión */}
+            <IconButton
+              color="inherit"
+              onClick={handleLogout}
+              aria-label="logout"
+            >
+              <ExitToAppIcon />
+            </IconButton>
           </Toolbar>
         </AppBar>
+
         <Drawer
           sx={{
             width: drawerWidth,
@@ -208,59 +300,80 @@ export default function PersistentDrawerLeft() {
           anchor="left"
           open={open}
         >
-          <DrawerHeader>
-            <IconButton onClick={handleDrawerClose}>
+          <DrawerHeaderStyled>
+            <IconButton style={{ color: "white" }} onClick={handleDrawerClose}>
               {theme.direction === "ltr" ? (
                 <ChevronLeftIcon />
               ) : (
                 <ChevronRightIcon />
               )}
             </IconButton>
-          </DrawerHeader>
-          <Typography variant="h5">Mi nombre</Typography>
-          <Typography variant="h5">Mi nombre</Typography>
-
-          <Divider />
-          <List>
-            <ListItem disablePadding>
-              <ListItemButton onClick={handleLogout}>
+          </DrawerHeaderStyled>
+          <DrawerContent>
+            <List>
+              <ListItem button onClick={handleNewNoteClick}>
                 <ListItemIcon>
-                  <ExitToAppIcon />
+                  <AddIcon /> {/* Asegúrate de importar AddIcon */}
                 </ListItemIcon>
-                <ListItemText primary="Cerrar Sesión" />
-              </ListItemButton>
-            </ListItem>
-          </List>
-          <Divider />
-          <List>
-            {notas.map((nota) => (
-              <ListItem key={nota.nota_id} disablePadding>
-                <ListItemButton>
-                  <CardNote titulo={nota.titulo} fecha={nota.fecha} />
-                </ListItemButton>
+                <ListItemText primary="Agregar Nueva Nota" />
               </ListItem>
-            ))}
-          </List>
+
+              {notas.map((nota) => (
+                <ListItem key={nota.nota_id} disablePadding>
+                  <ListItemButton onClick={() => handleNoteClick(nota.nota_id)}>
+                    <CardNote titulo={nota.titulo} fecha={nota.fecha} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          </DrawerContent>
         </Drawer>
         <Main open={open}>
           <DrawerHeader />
           <CornellNoteForm note={note} setNote={setNote}></CornellNoteForm>
           <FloatingActionButtons>
-            <Tooltip title="Guardar" aria-label="guardar">
-              <Fab color="primary" size="medium" onClick={handleSaveClick}>
-                <SaveIcon />
-              </Fab>
-            </Tooltip>
-            <Tooltip title="Editar" aria-label="editar">
-              <Fab color="secondary" size="medium" onClick={handleEditClick}>
-                <EditIcon />
-              </Fab>
-            </Tooltip>
-            <Tooltip title="Eliminar" aria-label="eliminar">
-              <Fab color="error" size="medium" onClick={handleDeleteClick}>
-                <DeleteIcon />
-              </Fab>
-            </Tooltip>
+            {!isEditing && (
+              <Tooltip title="Guardar nota" aria-label="guardar">
+                <Fab
+                  color="primary"
+                  size="medium"
+                  onClick={handleSaveClick}
+                  sx={{ m: 1 }}
+                >
+                  <SaveIcon />
+                </Fab>
+              </Tooltip>
+            )}
+            {isEditing && (
+              <>
+                <Tooltip title="Guardar cambios" aria-label="editar">
+                  <Fab
+                    color="secondary"
+                    size="medium"
+                    onClick={() =>
+                      isNoteSelected ? handleEditClick(note.nota_id) : () => {}
+                    }
+                    sx={{ m: 1 }}
+                  >
+                    <EditIcon />
+                  </Fab>
+                </Tooltip>
+                <Tooltip title="Eliminar nota" aria-label="eliminar">
+                  <Fab
+                    color="error"
+                    size="medium"
+                    onClick={() =>
+                      isNoteSelected
+                        ? handleDeleteClick(note.nota_id)
+                        : () => {}
+                    }
+                    sx={{ m: 1 }}
+                  >
+                    <DeleteIcon />
+                  </Fab>
+                </Tooltip>
+              </>
+            )}
           </FloatingActionButtons>
         </Main>
       </Box>
