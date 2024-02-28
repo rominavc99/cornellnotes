@@ -21,7 +21,6 @@ import {
   fetchNoteDetails,
 } from "../services/notesService";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Link from "@mui/material/Link";
 import CardNote from "./CardNote";
 import CornellNoteForm from "./CornellNoteForm";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"; // Icono para el botón de cerrar sesión
