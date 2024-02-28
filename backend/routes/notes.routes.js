@@ -36,17 +36,17 @@ router.use((req, res, next) => {
   next();
 });
 
-
 router.get("/auth/logout", (req, res) => {
   req.logout(function (err) {
     if (err) {
       return next(err);
     }
-    // Aquí puedes decidir a dónde redirigir al usuario después del logout
-    res.redirect("http://localhost:3001"); // Por ejemplo, de vuelta al inicio del frontend
+    // Usa una variable de entorno para la URL de redirección
+    const frontendURL =
+      process.env.REACT_APP_API_URL || "http://localhost:3001";
+    res.redirect(frontendURL);
   });
 });
-
 
 
 // Rutas que requieren autenticación con Google

@@ -20,7 +20,11 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 app.use(bodyParser.json());
 
 // Habilita CORS
-app.use(cors()); 
+const corsOptions = {
+  origin: "https://cornellnotes-3.onrender.com", // Permite solicitudes solo desde tu frontend
+};
+
+app.use(cors(corsOptions));
 
 // Configura la sesión de Express
 app.use(
