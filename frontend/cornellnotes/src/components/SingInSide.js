@@ -5,8 +5,6 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import DescriptionTwoToneIcon from "@mui/icons-material/DescriptionTwoTone";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { GoogleLogin } from "@react-oauth/google";
@@ -21,7 +19,7 @@ const SignInSide = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/config")
+      .get("https://cornellnotes-2sn1.onrender.com/api/config")
       .then((response) => {
         setClientId(response.data.client_id);
       })
@@ -48,7 +46,7 @@ const handleLoginSuccess = async (response) => {
     try {
       // Enviar la solicitud POST al servidor para guardar los datos en la base de datos
       const response = await axios.post(
-        "http://localhost:3000/api/users",
+        "https://cornellnotes-2sn1.onrender.com/api/users",
         userData
       );
       console.log("Respuesta del servidor:", response.data);

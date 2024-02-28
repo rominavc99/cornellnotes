@@ -4,9 +4,7 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import dayjs from "dayjs";
-import { saveNoteEdits } from "../services/notesService";
 
-import axios from "axios";
 
 export default function CornellNoteForm({ note, setNote }) {
   

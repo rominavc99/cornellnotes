@@ -6,7 +6,6 @@ import CssBaseline from "@mui/material/CssBaseline";
 import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
-import { Button } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -20,7 +19,6 @@ import {
   deleteNote,
   fetchNotes,
   fetchNoteDetails,
-  saveNoteEdits,
 } from "../services/notesService";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Link from "@mui/material/Link";
@@ -34,26 +32,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import SearchIcon from "@mui/icons-material/Search";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AddIcon from "@mui/icons-material/Add";
 
-import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { Accordion} from "@mui/material";
 
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary">
-      {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        CornellNotes
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
 
 const defaultTheme = createTheme();
 
@@ -62,10 +44,10 @@ const drawerWidth = 240;
 const handleLogout = () => {
   // Hacer una petición para cerrar la sesión
 axios
-  .get("http://localhost:3000/auth/logout")
+  .get("https://cornellnotes-2sn1.onrender.com/auth/logout")
   .then(() => {
     // Redirigir al usuario al frontend o a una página de inicio de sesión
-    window.location.href = "http://localhost:3001/";
+    window.location.href = "https://cornellnotes-2sn1.onrender.com/";
   })
   .catch((error) => console.error("Error al cerrar sesión:", error));
 };

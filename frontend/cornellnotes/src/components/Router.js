@@ -1,9 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import LoginComponent from "./LoginComponent";
 import HomeComponent from "./HomeComponent";
 import SignInSide from "./SingInSide";
-import ProtectedRoute from "./ProtectedRoute"; 
 import AboutUs from "./AboutUs";
 import Documentation from "./Documentation";
 import Footer from "./Footer";
