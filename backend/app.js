@@ -53,7 +53,7 @@ app.use(
 app.use(notesRoutes);
 
 // Inicia el servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor en funcionamiento en el puerto ${PORT}`);
+const PORT = process.env.PORT || 10000; // Render espera por defecto el puerto 10000, pero puedes configurarlo en las variables de entorno de Render
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server is running on port ${PORT}`);
 });
