@@ -8,7 +8,6 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const [clientId, setClientId] = useState("");
 
-
 useEffect(() => {
   axios
     .get("https://cornellnotes-2sn1.onrender.com/api/config")
