@@ -44,7 +44,7 @@ axios
   .get("https://cornellnotes-2sn1.onrender.com/auth/logout")
   .then(() => {
     // Redirigir al usuario al frontend o a una página de inicio de sesión
-    window.location.href = "https://cornellnotes-2sn1.onrender.com/";
+    window.location.href = "https://main--ideacatcher2.netlify.app/";
   })
   .catch((error) => console.error("Error al cerrar sesión:", error));
 };
