@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 
 // Habilita CORS
 const corsOptions = {
-  origin: "https://cornellnotes-3.onrender.com", // Permite solicitudes solo desde tu frontend
+  origin: "https://main--ideacatcher2.netlify.app", // Permite solicitudes solo desde tu frontend
 };
 
 app.use(cors(corsOptions));
