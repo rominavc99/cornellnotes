@@ -1,7 +1,7 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import React from "react";
 import AppRouter from "./components/Router";
-import Footer from "./components/Footer";
+
 
 const theme = createTheme({
   components: {

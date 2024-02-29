@@ -217,14 +217,6 @@ export default function PersistentDrawerLeft() {
     // Resto de tus estilos...
   });
 
-  const AccordionStyled = styled(Accordion)({
-    boxShadow: "none",
-    backgroundColor: "#E5E4E2",
-    "&:before": {
-      display: "none",
-    },
-    // Resto de tus estilos...
-  });
   return (
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: "flex" }}>
