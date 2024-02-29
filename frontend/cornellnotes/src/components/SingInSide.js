@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import decodeJwt from "../utils/decodeJwt.ts";
 
 const defaultTheme = createTheme();
+const clientID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
 const SignInSide = () => {
   const [clientId, setClientId] = useState("");
@@ -125,7 +126,7 @@ const handleLoginSuccess = async (response) => {
             >
               {clientId && (
                 <GoogleLogin
-                  clientId={clientId}
+                  clientId={clientID}
                   onSuccess={handleLoginSuccess}
                   onFailure={handleLoginFailure}
                   buttonText="Sign in with Google"
