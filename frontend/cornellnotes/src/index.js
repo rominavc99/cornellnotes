@@ -4,26 +4,38 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import axios from "axios"; // Asegúrate de importar axios
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-const [clientId, setClientId] = useState("");
+// Crear un componente funcional para manejar la carga del Client ID
+function AppWithGoogleAuth() {
+  const [clientId, setClientId] = useState("");
 
-useEffect(() => {
-  axios
-    .get("https://cornellnotes-2sn1.onrender.com/api/config")
-    .then((response) => {
-      setClientId(response.data.client_id);
-    })
-    .catch((error) => {
-      console.error("Error al obtener la configuración:", error);
-    });
-}, []);
+  useEffect(() => {
+    axios
+      .get("https://cornellnotes-2sn1.onrender.com/api/config")
+      .then((response) => {
+        setClientId(response.data.client_id);
+      })
+      .catch((error) => {
+        console.error("Error al obtener la configuración:", error);
+      });
+  }, []);
 
-root.render(
-  <React.StrictMode>
+  // Renderizar el GoogleOAuthProvider solo cuando clientId esté establecido
+  return clientId ? (
     <GoogleOAuthProvider clientId={clientId}>
       <App />
     </GoogleOAuthProvider>
+  ) : (
+    <div>Loading...</div> // O cualquier otro indicador de carga
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+
+root.render(
+  <React.StrictMode>
+    <AppWithGoogleAuth />
   </React.StrictMode>
 );
 
