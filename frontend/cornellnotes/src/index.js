@@ -1,16 +1,28 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-const clientID = process.env.REACT_APP_CLIENT_ID;
+const root = ReactDOM.createRoot(document.getElementById("root"));
+const [clientId, setClientId] = useState("");
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+
+useEffect(() => {
+  axios
+    .get("https://cornellnotes-2sn1.onrender.com/api/config")
+    .then((response) => {
+      setClientId(response.data.client_id);
+    })
+    .catch((error) => {
+      console.error("Error al obtener la configuración:", error);
+    });
+}, []);
+
 root.render(
   <React.StrictMode>
-    <GoogleOAuthProvider clientId={clientID}>
+    <GoogleOAuthProvider clientId={clientId}>
       <App />
     </GoogleOAuthProvider>
   </React.StrictMode>
